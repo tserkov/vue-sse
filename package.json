@@ -1,0 +1,41 @@
+{
+  "name": "vue-sse",
+  "version": "1.0.0",
+  "description": "A Vue plugin for using Server-Sent Events (EventSource)",
+  "keywords": [
+    "vue",
+    "sse",
+    "eventsource",
+    "server sent events"
+  ],
+  "main": "dist/vue-sse.js",
+  "module": "src/vue-sse.js",
+  "jsnext:main": "src/vue-sse.js",
+  "repository": "https://github.com/tserkov/vue-sse",
+  "author": "tserkov <james.churchard@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "build": "yarn lint && ./node_modules/.bin/babel src/vue-sse.js --out-file dist/vue-sse.js --presets=es2015,minify",
+    "lint": "eslint --ext .js src"
+  },
+  "pre-commit": [
+    "build"
+  ],
+  "dependencies": {
+    "babel-runtime": "^6.26.0",
+    "eventsource-polyfill": "^0.9.6"
+  },
+  "peerDependencies": {
+    "vue": "^2.5.13"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-minify": "^0.3.0",
+    "eslint": "^4.14.0",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-friendly-formatter": "^3.0.0",
+    "eslint-plugin-import": "^2.8.0",
+    "pre-commit": "^1.2.2"
+  }
+}
