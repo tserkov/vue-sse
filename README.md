@@ -33,13 +33,14 @@ Currently, VueSSE accepts the following config options
 
 ## Methods
 Once you've successfully connected to an events server, an object will be returned with the following methods:
+
 | Name | Description |
 | --- | --- |
 | getSource() | Returns the underlying EventSource. |
 | onError(_function_ handler) | Allows your application to handle any errors thrown, such as loss of server connection and format pre-processing errors. |
 | subscribe(_string_ event, _function_ handler) | Adds an event-specific listener to the event stream.  The handler function receives the message as its argument, formatted if a format was specified. |
 | unsubscribe(_string_ event) | Removes all event-specific listeners from the event stream. |
-| close() | Closes the connection.  __Once closed, it cannot be re-opened!You will need to call `$sse` again.__
+| close() | Closes the connection.  __Once closed, it cannot be re-opened!You will need to call `$sse` again.__ |
 
 ## Examples
 
