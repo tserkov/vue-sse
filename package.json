@@ -1,6 +1,6 @@
 {
   "name": "vue-sse",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A Vue plugin for using Server-Sent Events (EventSource)",
   "keywords": [
     "vue",

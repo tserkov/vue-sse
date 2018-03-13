@@ -2,7 +2,7 @@
 import 'eventsource-polyfill';
 
 const formatters = {
-  raw: e => e.data,
+  plain: e => e.data,
   json: e => JSON.parse(e.data),
 };
 
@@ -13,7 +13,7 @@ export default {
         {},
         {
           withCredentials: false,
-          format: 'raw',
+          format: 'plain',
         },
         cfg,
       );
