@@ -46,7 +46,9 @@ export default {
                 try {
                   data = formatters[config.format](e);
                 } catch (err) {
-                  source.onerror(err);
+                  if (typeof source.onerror === 'function') {
+                    source.onerror(err);
+                  }
                 }
 
                 handler(data);
