@@ -14,6 +14,15 @@ npm install --save vue-sse
 yarn add vue-sse
 ```
 
+```javascript
+// in main.js
+import VueSSE from 'vue-sse';
+
+// ...
+
+Vue.use(VueSSE);
+```
+
 ## Usage
 VueSSE can be invoked globally from the Vue object via `Vue.SSE(...)` or from within components via `this.$sse(...)`
 
@@ -147,35 +156,35 @@ export default {
         msgServer = await $sse('/your-events-server', { format: 'json' }); // omit for no format pre-processing
 
         // Catch any errors (ie. lost connections, etc.)
-        sse.onError(e => {
+        msgServer.onError(e => {
           console.error('lost connection; giving up!', e);
 
           // This is purely for example; EventSource will automatically
           // attempt to reconnect indefinitely, with no action needed
           // on your part to resubscribe to events once (if) reconnected
-          sse.close();
+          msgServer.close();
         });
 
         // Listen for messages without a specified event
-        sse.subscribe('', data => {
+        msgServer.subscribe('', data => {
           console.warn('Received a message w/o an event!', data);
         });
 
         // Listen for messages based on their event (in this case, "chat")
-        sse.subscribe('chat', message => {
+        msgServer.subscribe('chat', message => {
           this.messages.push(message);
         });
 
         // Unsubscribes from event-less messages after 7 seconds
         setTimeout(() => {
-          sse.unsubscribe('');
+          msgServer.unsubscribe('');
 
           console.log('Stopped listening to event-less messages!');
         }, 7000);
 
         // Unsubscribes from chat messages after 7 seconds
         setTimeout(() => {
-          sse.unsubscribe('chat');
+          msgServer.unsubscribe('chat');
 
           console.log('Stopped listening to chat messages');
         }, 14000);
