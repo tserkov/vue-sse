@@ -159,10 +159,9 @@ export default {
         msgServer.onError(e => {
           console.error('lost connection; giving up!', e);
 
-          // This is purely for example; EventSource will automatically
-          // attempt to reconnect indefinitely, with no action needed
-          // on your part to resubscribe to events once (if) reconnected
-          msgServer.close();
+          // If you don't want SSE to automatically reconnect (if possible),
+          // then uncomment the following line:
+          // msgServer.close();
         });
 
         // Listen for messages without a specified event
