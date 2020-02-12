@@ -51,7 +51,7 @@ export default {
                   }
                 }
 
-                handler(data);
+                handler(data, e);
               };
 
               if (!subscribers[event]) {
