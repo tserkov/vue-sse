@@ -91,7 +91,7 @@ export default {
 
         // Listen for messages without a specified event
         sse.subscribe('', (message, rawEvent) => {
-          console.warn('Received a message w/o an event!', data);
+          console.warn('Received a message w/o an event!', message);
         });
 
         // Listen for messages based on their event (in this case, "chat")
