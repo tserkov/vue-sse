@@ -1,12 +1,12 @@
 import Vue from 'vue';
-import VueSSE from './index';
+import { SSEManager } from './index';
 
 declare module 'vue/types/vue' {
   interface VueConstructor {
-    $sse: any;
+    $sse: SSEManager;
   }
 
   interface Vue {
-    $sse: any;
+    $sse: SSEManager;
   }
 }
