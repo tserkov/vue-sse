@@ -10,34 +10,47 @@ VueSSE enables effortless use of [Server-Sent Events](https://developer.mozilla.
 # npm
 npm install --save vue-sse
 
-# or yarn
+# yarn
 yarn add vue-sse
 ```
 
 ```javascript
 // in main.js
+// using defaults
+import VueSSE from 'vue-sse';
+Vue.use(VueSSE);
+````
+
+```javascript
+// in main.js
+// using custom defaults
 import VueSSE from 'vue-sse';
 
-// ...
-
-Vue.use(VueSSE);
+Vue.use(VueSSE, {
+  format: 'json', // parse messages as JSON
+  polyfill: true, // support older browsers
+  url: 'http://my.api.com/sse' // default sse server url
+  withCredentials: true, // send cookies
+});
 ```
 
 ## Usage
-VueSSE can be invoked globally from the Vue object via `Vue.SSE(...)` or from within components via `this.$sse(...)`
+VueSSE can be invoked globally from the Vue object via `Vue.$sse.create(...)` or from within components via `this.$sse.create(...)`
 
 All of the following are valid calls to instantiate a connection to a event stream server:
-- `Vue.SSE('/your-events-endpoint')` from anywhere the global Vue object is accessible;
-- `this.$sse('/your-events-endpoint')` from inside any component method/lifecycle hook;
-- `Vue.SSE('/your-events-endpoint', { format: 'json' })` will automatically process incoming messages as JSON;
-- `this.$sse('/your-events-endpoint', { withCredentials: true })` will set CORS on the request.
+- `Vue.$sse.create({ url: '/your-events-endpoint' })` from anywhere the global Vue object is accessible;
+- `this.$sse.create({ url: '/your-events-endpoint' })` from inside any component method/lifecycle hook;
+- `Vue.$sse.create({ url: '/your-events-endpoint', format: 'json' })` will automatically process incoming messages as JSON;
+- `this.$sse.create({ url: '/your-events-endpoint', withCredentials: true })` will set CORS on the request.
 
 ## Configuration
-Currently, VueSSE accepts the following config options
+VueSSE accepts the following config options when adding VueSSE via `Vue.use(...)` and when calling `$sse.create`.
 
-| Command | Description | Default |
+| Option | Description | Default |
 | --- | --- | --- |
-| format | Specify pre-processing, if any, to perform on incoming messages. Currently, only a JSON formatter is available by specifying `"json"`.  Messages that fail formatting will emit an error. | `"plain"` |
+| format: _ | Specify pre-processing, if any, to perform on incoming messages. Currently, only a JSON formatter is available by specifying `"json"`.  Messages that fail formatting will emit an error. | `"plain"` |
+| polyfill | Include an EventSource polyfill for older browsers | `false` |
+| url | The location of the SSE server | `""` |
 | withCredentials | Indicates if CORS should be set to include credentials. | `false` |
 
 ## Methods
@@ -45,11 +58,13 @@ Once you've successfully connected to an events server, an object will be return
 
 | Name | Description |
 | --- | --- |
-| getSource() | Returns the underlying EventSource. |
-| onError(_function_ handler) | Allows your application to handle any errors thrown, such as loss of server connection and format pre-processing errors. |
-| subscribe(_string_ event, _function_ handler) | Adds an event-specific listener to the event stream.  The handler function receives the message as its argument (formatted if a format was specified), and the original underlying Event. |
-| unsubscribe(_string_ event) | Removes all event-specific listeners from the event stream. |
-| close() | Closes the connection.  __Once closed, it cannot be re-opened!You will need to call `$sse` again.__ |
+| connect(): _Promise<SSEClient>_ | 
+| source | Returns the underlying EventSource. |
+| onError(handler: _function_): _SSEClient_ | Allows your application to handle any errors thrown, such as loss of server connection and format pre-processing errors. |
+| on(_string_ event, _function_ handler): _SSEClient_ | Adds an event-specific listener to the event stream.  The handler function receives the message as its argument (formatted if a format was specified), and the original underlying Event. |
+| once(_string_ event, _function_ handler): _SSEClient_ | Same as on, but only triggered once. |
+| off(_string_ event): _SSEClient_ | Removes all event-specific listeners from the event stream. |
+| disconnect() | Closes the connection. |
 
 ## Examples
 
