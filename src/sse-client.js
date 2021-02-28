@@ -4,7 +4,7 @@ export const formatJSON = (e) => JSON.parse(e.data);
 
 export default class SSEClient {
   constructor(config) {
-    this._handlers = config.handlers || {};
+    this._handlers = {};
     this._listeners = {};
     this._source = null;
 
@@ -24,6 +24,12 @@ export default class SSEClient {
       }
     } else {
       this._format = formatText;
+    }
+
+    if (config.handlers) {
+      for (const event in config.handlers) {
+        this.on(event, config.handlers[event]);
+      }
     }
 
     this.url = config.url;
