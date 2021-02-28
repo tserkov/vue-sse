@@ -41,10 +41,9 @@ export default class SSEClient {
 
     return new Promise((resolve, reject) => {
       this._source.onopen = () => {
-        // Add event listeners/handlers that were
-        // provided at config-time.
-        for (let event in this._handlers) {
-          this.on(event, this._handlers[event]);
+        // Add event listeners that were added before we connected
+        for (let event in this._listeners) {
+          this._source.addEventListener(event, this._listeners[event]);
         }
 
         this._source.onerror = null;
@@ -128,11 +127,11 @@ export default class SSEClient {
         return;
       }
 
-      for (let handler of this._handlers[event]) {
-        handler(data);
-      }
+      this._handlers[event].forEach((handler) => handler(data));
     };
 
-    this._source.addEventListener(event, this._listeners[event]);
+    if (this._source) {
+      this._source.addEventListener(event, this._listeners[event]);
+    }
   }
 }

@@ -3,7 +3,7 @@ import { SSEManager } from './index';
 
 declare module 'vue/types/vue' {
   interface VueConstructor {
-    $sse: SSEManager;
+    readonly $sse: SSEManager;
   }
 
   interface Vue {

@@ -18,10 +18,10 @@
   "sideEffects": [
     "./src/sse-client.js"
   ],
-  "directories": {
-    "example": "example",
-    "lib": "lib"
-  },
+  "files": [
+    "dist",
+    "types/*.d.ts"
+  ],
   "scripts": {
     "build": "rollup -c rollup.config.js",
     "format": "prettier --write \"src/**/*.js\"",
@@ -45,12 +45,7 @@
     "eventsource",
     "server sent events"
   ],
-  "author": "tserkov <james.churchard@gmail.com>",
-  "files": [
-    "dist",
-    "types/index.d.ts",
-    "types/vue.d.ts"
-  ],
+  "author": "tserkov",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/tserkov/vue-sse/issues"

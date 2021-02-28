@@ -7,7 +7,7 @@ import pkg from './package.json';
 const banner = `/*!
  * vue-sse v${pkg.version}
  * (c) ${new Date().getFullYear()} James Churchard
- * @license ISC
+ * @license MIT
  */`
 
 export default [
@@ -22,6 +22,7 @@ export default [
       resolve(),
       commonjs(),
     ],
+    inlineDynamicImports: true,
   },
   {
     input: 'src/index.js',
@@ -35,6 +36,7 @@ export default [
       commonjs(),
       terser({ module: true })
     ],
+    inlineDynamicImports: true,
   },
   {
     input: 'src/index.js',
@@ -48,6 +50,7 @@ export default [
       resolve(),
       commonjs(),
     ],
+    inlineDynamicImports: true,
   },
   {
     input: 'src/index.cjs.js',
@@ -62,6 +65,7 @@ export default [
       resolve(),
       commonjs(),
     ],
+    inlineDynamicImports: true,
   },
   {
     input: 'src/index.cjs.js',
@@ -77,6 +81,7 @@ export default [
       commonjs(),
       terser({ module: false })
     ],
+    inlineDynamicImports: true,
   },
   {
     input: 'src/index.cjs.js',
@@ -91,5 +96,6 @@ export default [
       resolve(),
       commonjs(),
     ],
+    inlineDynamicImports: true,
   },
 ];

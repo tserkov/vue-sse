@@ -1,6 +1,5 @@
-import _Vue from 'vue';
-
 import './vue';
+import Vue from 'vue';
 
 export type MessageFormatter<T> = (event: MessageEvent) => T;
 
@@ -40,11 +39,11 @@ export declare class SSEClient {
 	get source(): EventSource;
 }
 
-export declare function install(Vue: typeof _Vue, config?: SSEConfig): void;
+export declare function install(vue: typeof Vue, config?: SSEConfig): void;
 
 declare const _default: {
+	SSEClient: typeof SSEClient;
+	SSEManager: typeof SSEManager;
 	install: typeof install;
 }
 export default _default;
-
-// EventSource -> EventListener -> MessageHandler[]
