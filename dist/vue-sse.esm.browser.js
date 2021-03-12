@@ -1,5 +1,5 @@
 /*!
- * vue-sse v2.0.0
+ * vue-sse v2.0.2
  * (c) 2021 James Churchard
  * @license MIT
  */
@@ -9,7 +9,7 @@ const formatJSON = (e) => JSON.parse(e.data);
 
 class SSEClient {
   constructor(config) {
-    this._handlers = config.handlers || {};
+    this._handlers = {};
     this._listeners = {};
     this._source = null;
 
@@ -29,6 +29,12 @@ class SSEClient {
       }
     } else {
       this._format = formatText;
+    }
+
+    if (config.handlers) {
+      for (const event in config.handlers) {
+        this.on(event, config.handlers[event]);
+      }
     }
 
     this.url = config.url;
@@ -161,7 +167,18 @@ class SSEManager {
     );
   }
 
-  create(config) {
+  create(configOrURL) {
+    let config;
+    if (typeof configOrURL === 'object') {
+      config = configOrURL;
+    } else if (typeof configOrURL === 'string') {
+      config = {
+        url: configOrURL,
+      };
+    } else {
+      config = {};
+    }
+
     return new SSEClient(Object.assign({}, this.$defaultConfig, config));
   }
 }

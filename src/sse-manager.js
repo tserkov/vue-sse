@@ -20,7 +20,18 @@ export class SSEManager {
     );
   }
 
-  create(config) {
+  create(configOrURL) {
+    let config;
+    if (typeof configOrURL === 'object') {
+      config = configOrURL;
+    } else if (typeof configOrURL === 'string') {
+      config = {
+        url: configOrURL,
+      };
+    } else {
+      config = {};
+    }
+
     return new SSEClient(Object.assign({}, this.$defaultConfig, config));
   }
 }

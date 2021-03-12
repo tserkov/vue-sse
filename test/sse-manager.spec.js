@@ -27,4 +27,12 @@ describe('SSEManager', () => {
     expect(client.url).toEqual('bar.local');
     expect(client.withCredentials).toEqual(false);
   });
+
+  it('creates a client from url string not config object', () => {
+    const $sse = new SSEManager();
+
+    const client = $sse.create('foo.local');
+
+    expect(client.url).toEqual('foo.local');
+  });
 });

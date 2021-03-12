@@ -17,7 +17,7 @@ export declare class SSEManager {
 	$defaultConfig: SSEConfig;
 
 	constructor(config?: SSEConfig);
-	create(config?: SSEConfig): SSEClient;
+	create(configOrURL?: SSEConfig | string): SSEClient;
 }
 
 export declare class SSEClient {
