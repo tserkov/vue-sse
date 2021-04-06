@@ -169,8 +169,9 @@ export default {
     (async () => {
       try {
         // Store SSE object at a higher scope
-        msgServer = await $sse.create({url: '/your-events-server', format: 'json' }).connect(); // omit for no format pre-processing
-
+        msgServer = await $sse.create({url: '/your-events-server', format: 'json' }); // omit for no format pre-processing
+        msgServer.connect();
+  
         // Catch any errors (ie. lost connections, etc.)
         msgServer.on('error', (e) => {
           console.error('lost connection; giving up!', e);
