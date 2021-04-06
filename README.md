@@ -60,7 +60,7 @@ Once you've successfully connected to an events server, an object will be return
 | --- | --- |
 | connect(): _Promise<SSEClient>_ | 
 | source | Returns the underlying EventSource. |
-| onError(handler: _function_): _SSEClient_ | Allows your application to handle any errors thrown, such as loss of server connection and format pre-processing errors. |
+| on("error", _function_ handler): _SSEClient_ | Allows your application to handle any errors thrown, such as loss of server connection and format pre-processing errors. |
 | on(_string_ event, _function_ handler): _SSEClient_ | Adds an event-specific listener to the event stream.  The handler function receives the message as its argument (formatted if a format was specified), and the original underlying Event. |
 | once(_string_ event, _function_ handler): _SSEClient_ | Same as on, but only triggered once. |
 | off(_string_ event): _SSEClient_ | Removes all event-specific listeners from the event stream. |
@@ -89,19 +89,20 @@ export default {
     };
   },
   mounted() {
-    this.$sse('/your-events-server', { format: 'json' }) // or { format: 'plain' }
+    this.$sse.create({url: '/your-events-server', format: 'json' }) // or { format: 'plain' }
+      .connect()
       .then(sse => {
         // Store SSE object at a higher scope
         msgServer = sse;
 
         // Catch any errors (ie. lost connections, etc.)
-        sse.onError(e => {
+        sse.on("error", (e) => {
           console.error('lost connection; giving up!', e);
 
           // This is purely for example; EventSource will automatically
           // attempt to reconnect indefinitely, with no action needed
           // on your part to resubscribe to events once (if) reconnected
-          sse.close();
+          sse.disconnect();
         });
 
         // Listen for messages without a specified event
@@ -137,7 +138,7 @@ export default {
   beforeDestroy() {
     // Make sure to close the connection with the events server
     // when the component is destroyed, or we'll have ghost connections!
-    msgServer.close();
+    msgServer.disconnect();
   },
 };
 </script>
@@ -168,15 +169,15 @@ export default {
     (async () => {
       try {
         // Store SSE object at a higher scope
-        msgServer = await $sse('/your-events-server', { format: 'json' }); // omit for no format pre-processing
+        msgServer = await $sse.create({url: '/your-events-server', format: 'json' }).connect(); // omit for no format pre-processing
 
         // Catch any errors (ie. lost connections, etc.)
-        msgServer.onError(e => {
+        msgServer.on("error", (e) => {
           console.error('lost connection; giving up!', e);
 
           // If you don't want SSE to automatically reconnect (if possible),
           // then uncomment the following line:
-          // msgServer.close();
+          // msgServer.disconnect();
         });
 
         // Listen for messages without a specified event
@@ -212,7 +213,7 @@ export default {
   beforeDestroy() {
     // Make sure to close the connection with the events server
     // when the component is destroyed, or we'll have ghost connections!
-    msgServer.close();
+    msgServer.disconnect();
   },
 };
 </script>
