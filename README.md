@@ -60,7 +60,7 @@ Once you've successfully connected to an events server, an object will be return
 | --- | --- |
 | connect(): _Promise<SSEClient>_ | 
 | source | Returns the underlying EventSource. |
-| on("error", _function_ handler): _SSEClient_ | Allows your application to handle any errors thrown, such as loss of server connection and format pre-processing errors. |
+| on('error', _function_ handler): _SSEClient_ | Allows your application to handle any errors thrown, such as loss of server connection and format pre-processing errors. |
 | on(_string_ event, _function_ handler): _SSEClient_ | Adds an event-specific listener to the event stream.  The handler function receives the message as its argument (formatted if a format was specified), and the original underlying Event. |
 | once(_string_ event, _function_ handler): _SSEClient_ | Same as on, but only triggered once. |
 | off(_string_ event): _SSEClient_ | Removes all event-specific listeners from the event stream. |
@@ -96,7 +96,7 @@ export default {
         msgServer = sse;
 
         // Catch any errors (ie. lost connections, etc.)
-        sse.on("error", (e) => {
+        sse.on('error', (e) => {
           console.error('lost connection; giving up!', e);
 
           // This is purely for example; EventSource will automatically
@@ -172,7 +172,7 @@ export default {
         msgServer = await $sse.create({url: '/your-events-server', format: 'json' }).connect(); // omit for no format pre-processing
 
         // Catch any errors (ie. lost connections, etc.)
-        msgServer.on("error", (e) => {
+        msgServer.on('error', (e) => {
           console.error('lost connection; giving up!', e);
 
           // If you don't want SSE to automatically reconnect (if possible),
