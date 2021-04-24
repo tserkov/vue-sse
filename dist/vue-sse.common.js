@@ -1,5 +1,5 @@
 /*!
- * vue-sse v2.0.2
+ * vue-sse v2.1.1
  * (c) 2021 James Churchard
  * @license MIT
  */

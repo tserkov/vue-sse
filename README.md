@@ -1,7 +1,6 @@
 # VueSSE
 [![GitHub issues](https://img.shields.io/github/issues/tserkov/vue-sse.svg)]()
 [![license](https://img.shields.io/github/license/tserkov/vue-sse.svg)]()
-[![Beerpay](https://img.shields.io/beerpay/tserkov/vue-sse.svg)](https://beerpay.io/tserkov/vue-sse)
 
 VueSSE enables effortless use of [Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events) by providing a high-level interface to an underlying [EventSource](https://developer.mozilla.org/en-US/docs/Web/API/EventSource).
 
@@ -10,76 +9,92 @@ VueSSE enables effortless use of [Server-Sent Events](https://developer.mozilla.
 # npm
 npm install --save vue-sse
 
-# yarn
+# OR yarn
 yarn add vue-sse
 ```
 
 ```javascript
 // in main.js
+import VueSSE from 'vue-sse';
+
 // using defaults
-import VueSSE from 'vue-sse';
 Vue.use(VueSSE);
-````
 
-```javascript
-// in main.js
-// using custom defaults
-import VueSSE from 'vue-sse';
-
+// OR specify custom defaults (described below)
 Vue.use(VueSSE, {
-  format: 'json', // parse messages as JSON
-  polyfill: true, // support older browsers
-  url: 'http://my.api.com/sse' // default sse server url
-  withCredentials: true, // send cookies
+  format: 'json',
+  polyfill: true,
+  url: '/my-events-server'
+  withCredentials: true,
 });
 ```
 
-## Usage
-VueSSE can be invoked globally from the Vue object via `Vue.$sse.create(...)` or from within components via `this.$sse.create(...)`
+## Quickstart
+```js
+this.$sse.create('/my-events-server')
+  .on('message', (msg) => console.info('Message:', msg))
+  .on('error', (err) => console.error('Failed to parse or lost connection:', err))
+  .connect()
+  .catch((err) => console.error('Failed make initial connection:', err));
+```
 
-All of the following are valid calls to instantiate a connection to a event stream server:
-- `Vue.$sse.create({ url: '/your-events-endpoint' })` from anywhere the global Vue object is accessible;
-- `this.$sse.create({ url: '/your-events-endpoint' })` from inside any component method/lifecycle hook;
-- `Vue.$sse.create({ url: '/your-events-endpoint', format: 'json' })` will automatically process incoming messages as JSON;
-- `this.$sse.create({ url: '/your-events-endpoint', withCredentials: true })` will set CORS on the request.
+## Usage
+Clients can be created from the Vue object via `Vue.$sse.create(...)` or from within components via `this.$sse.create(...)`
+
+All of the following are valid calls to create a client:
+- `this.$sse.create('/your-events-endpoint')` to connect to the specified URL without specifying any config
+- `this.$sse.create({ url: '/your-events-endpoint', format: 'json' })` will automatically parse incoming messages as JSON
+- `this.$sse.create({ url: '/your-events-endpoint', withCredentials: true })` will set CORS on the request
+
+Once you've created a client, you can add handlers before or after calling `connect()`, which must be called.
 
 ## Configuration
-VueSSE accepts the following config options when adding VueSSE via `Vue.use(...)` and when calling `$sse.create`.
+`$sse.create` accepts the following config options when installing VueSSE via `Vue.use` and when calling `$sse.create`.
 
-| Option | Description | Default |
-| --- | --- | --- |
-| format: _ | Specify pre-processing, if any, to perform on incoming messages. Currently, only a JSON formatter is available by specifying `"json"`.  Messages that fail formatting will emit an error. | `"plain"` |
-| polyfill | Include an EventSource polyfill for older browsers | `false` |
-| url | The location of the SSE server | `""` |
-| withCredentials | Indicates if CORS should be set to include credentials. | `false` |
+| Option | Type | Description | Default |
+| --- | --- | --- | -- |
+| format | `"plain"` \| `"json"` \| `(event: MessageEvent) => any` | Specify pre-processing, if any, to perform on incoming messages. Messages that fail formatting will emit an error. | `"plain"` |
+| polyfill | `boolean` | Include an [EventSource polyfill](https://github.com/Yaffle/EventSource) for older browsers. | `false` |
+| url | `string` | The location of the SSE server. | `""` |
+| withCredentials | `boolean` | Indicates if CORS should be set to include credentials. | `false` |
+
+If `$sse.create` is called with a string, it must be the URL to the SSE server.
 
 ## Methods
-Once you've successfully connected to an events server, an object will be returned with the following methods:
+Once you've successfully connected to an events server, a client will be returned with the following methods:
 
 | Name | Description |
 | --- | --- |
-| connect(): _Promise<SSEClient>_ | 
-| source | Returns the underlying EventSource. |
-| on('error', _function_ handler): _SSEClient_ | Allows your application to handle any errors thrown, such as loss of server connection and format pre-processing errors. |
-| on(_string_ event, _function_ handler): _SSEClient_ | Adds an event-specific listener to the event stream.  The handler function receives the message as its argument (formatted if a format was specified), and the original underlying Event. |
-| once(_string_ event, _function_ handler): _SSEClient_ | Same as on, but only triggered once. |
-| off(_string_ event): _SSEClient_ | Removes all event-specific listeners from the event stream. |
-| disconnect() | Closes the connection. |
+| __connect__(): _Promise<SSEClient>_ | Connects to the server. __Must be called.__ |
+| __on__(event: _string_, (data: _any_) => _void_): _SSEClient_ | Adds an event-specific listener to the event stream.  The handler function receives the message as its argument (formatted if a format was specified), and the original underlying Event. For non-event messages, specify `""` or `"message"` as the event. |
+| __once__(event: _string_, (data: _any_) => _void_): _SSEClient_ | Same as `on(...)`, but only triggered once. |
+| __off__(event: _string_, (data: _any_ => _void_)): _SSEClient_ | Removes the given handler from the event stream. The function must be the same as provided to `on`/`once`. |
+| __on__('error', (err) => void): _SSEClient_ | Allows your application to handle any errors thrown, such as loss of server connection and pre-processing errors. |
+| __disconnect__(): _void_ | Closes the connection. The client can be re-used by calling `connect()`. __Must be called!__ (Usually, in the `beforeDestroy` of your component.) |
 
-## Examples
+## Properties
+| Name | Type | Description |
+| --- | --- | --- |
+| source | `EventSource` | Returns the underlying EventSource. |
 
-### Promises
+## Example
+An example project is provided at [tserkov/vue-sse-example](https://github.com/tserkov/vue-sse-example).
+
+### Kitchen Sink
 ```html
 <template>
   <div>
-    <p v-for="message in messages">{{ message }}</p>
+    <p
+      v-for="(message, idx) in messages"
+      :key="idx"
+    >{{ message }}</p>
   </div>
 </template>
 
 <script>
-// We store the reference to the SSE object out here
+// We store the reference to the SSE client out here
 // so we can access it from other methods
-let msgServer;
+let sseClient;
 
 export default {
   name: 'sse-test',
@@ -89,132 +104,72 @@ export default {
     };
   },
   mounted() {
-    this.$sse.create({url: '/your-events-server', format: 'json' }) // or { format: 'plain' }
-      .connect()
+    sseClient = this.$sse.create({
+      url: '/your-events-server',
+      format: 'json',
+      withCredentials: true,
+      polyfill: true,
+    });
+
+    // Catch any errors (ie. lost connections, etc.)
+    sseClient.on('error', (e) => {
+      console.error('lost connection or failed to parse!', e);
+
+      // If this error is due to an unexpected disconnection, EventSource will
+      // automatically attempt to reconnect indefinitely. You will _not_ need to
+      // re-add your handlers.
+    });
+
+    // Handle messages without a specific event
+    sseClient.on('message', handleMessage);
+
+    // Handle 'chat' messages
+    sseClient.on('chat', handleChat);
+
+    // Handle once for a ban message
+    sseClient.once('ban', handleBan);
+
+    sseClient.connect()
       .then(sse => {
-        // Store SSE object at a higher scope
-        msgServer = sse;
-
-        // Catch any errors (ie. lost connections, etc.)
-        sse.on('error', (e) => {
-          console.error('lost connection; giving up!', e);
-
-          // This is purely for example; EventSource will automatically
-          // attempt to reconnect indefinitely, with no action needed
-          // on your part to resubscribe to events once (if) reconnected
-          sse.disconnect();
-        });
-
-        // Listen for messages without a specified event
-        sse.subscribe('', (message, rawEvent) => {
-          console.warn('Received a message w/o an event!', message);
-        });
-
-        // Listen for messages based on their event (in this case, "chat")
-        sse.subscribe('chat', (message, rawEvent) => {
-          this.messages.push(message);
-        });
+        console.log('We\'re connected!');
 
         // Unsubscribes from event-less messages after 7 seconds
         setTimeout(() => {
-          sse.unsubscribe('');
-
+          sseClient.off('message', handleMessage);
           console.log('Stopped listening to event-less messages!');
         }, 7000);
 
-        // Unsubscribes from chat messages after 7 seconds
+        // Unsubscribes from chat messages after 14 seconds
         setTimeout(() => {
-          sse.unsubscribe('chat');
-
+          sse.off('chat', handleChat);
           console.log('Stopped listening to chat messages!');
         }, 14000);
       })
-      .catch(err => {
+      .catch((err) => {
         // When this error is caught, it means the initial connection to the
         // events server failed.  No automatic attempts to reconnect will be made.
         console.error('Failed to connect to server', err);
       });
   },
-  beforeDestroy() {
-    // Make sure to close the connection with the events server
-    // when the component is destroyed, or we'll have ghost connections!
-    msgServer.disconnect();
-  },
-};
-</script>
-```
-
-### Async/Await
-
-```html
-<template>
-  <div>
-    <p v-for="message in messages">{{ message }}</p>
-  </div>
-</template>
-
-<script>
-// We store the reference to the SSE object out here
-// so we can access it from other methods
-let msgServer;
-
-export default {
-  name: 'sse-test',
-  data() {
-    return {
-      messages: [],
-    };
-  },
-  mounted() {
-    (async () => {
-      try {
-        // Store SSE object at a higher scope
-        msgServer = await $sse.create({url: '/your-events-server', format: 'json' }); // omit for no format pre-processing
-        msgServer.connect();
-  
-        // Catch any errors (ie. lost connections, etc.)
-        msgServer.on('error', (e) => {
-          console.error('lost connection; giving up!', e);
-
-          // If you don't want SSE to automatically reconnect (if possible),
-          // then uncomment the following line:
-          // msgServer.disconnect();
-        });
-
-        // Listen for messages without a specified event
-        msgServer.subscribe('', (data, rawEvent) => {
-          console.warn('Received a message w/o an event!', data);
-        });
-
-        // Listen for messages based on their event (in this case, "chat")
-        msgServer.subscribe('chat', (message, rawEvent) => {
-          this.messages.push(message);
-        });
-
-        // Unsubscribes from event-less messages after 7 seconds
-        setTimeout(() => {
-          msgServer.unsubscribe('');
-
-          console.log('Stopped listening to event-less messages!');
-        }, 7000);
-
-        // Unsubscribes from chat messages after 7 seconds
-        setTimeout(() => {
-          msgServer.unsubscribe('chat');
-
-          console.log('Stopped listening to chat messages');
-        }, 14000);
-      } catch (err) {
-        // When this error is caught, it means the initial connection to the
-        // events server failed.  No automatic attempts to reconnect will be made.
-        console.error('Failed to connect to server', err);
-      }
-    })();
+  methods: {
+    handleBan(banMessage) {
+      // Note that we can access properties of message, since our parser is set to JSON
+      // and the hypothetical object has a `reason` property.
+      this.messages.push(`You've been banned! Reason: ${banMessage.reason}`);
+    },
+    handleChat(message) {
+      // Note that we can access properties of message, since our parser is set to JSON
+      // and the hypothetical object has these properties.
+      this.messages.push(`${message.user} said: ${message.text}`);
+    },
+    handleMessage(message) {
+      console.warn('Received a message w/o an event!', message);
+    },
   },
   beforeDestroy() {
     // Make sure to close the connection with the events server
     // when the component is destroyed, or we'll have ghost connections!
-    msgServer.disconnect();
+    sseClient.disconnect();
   },
 };
 </script>
