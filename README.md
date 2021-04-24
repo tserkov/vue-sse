@@ -19,7 +19,7 @@ yarn add vue-sse
 // using defaults
 import VueSSE from 'vue-sse';
 Vue.use(VueSSE);
-````
+```
 
 ```javascript
 // in main.js
@@ -29,7 +29,7 @@ import VueSSE from 'vue-sse';
 Vue.use(VueSSE, {
   format: 'json', // parse messages as JSON
   polyfill: true, // support older browsers
-  url: 'http://my.api.com/sse' // default sse server url
+  url: 'http://my.api.com/sse', // default sse server url
   withCredentials: true, // send cookies
 });
 ```
@@ -106,25 +106,25 @@ export default {
         });
 
         // Listen for messages without a specified event
-        sse.subscribe('', (message, rawEvent) => {
+        sse.on('', (message, rawEvent) => {
           console.warn('Received a message w/o an event!', message);
         });
 
         // Listen for messages based on their event (in this case, "chat")
-        sse.subscribe('chat', (message, rawEvent) => {
+        sse.on('chat', (message, rawEvent) => {
           this.messages.push(message);
         });
 
         // Unsubscribes from event-less messages after 7 seconds
         setTimeout(() => {
-          sse.unsubscribe('');
+          sse.off('');
 
           console.log('Stopped listening to event-less messages!');
         }, 7000);
 
         // Unsubscribes from chat messages after 7 seconds
         setTimeout(() => {
-          sse.unsubscribe('chat');
+          sse.off('chat');
 
           console.log('Stopped listening to chat messages!');
         }, 14000);
@@ -182,25 +182,25 @@ export default {
         });
 
         // Listen for messages without a specified event
-        msgServer.subscribe('', (data, rawEvent) => {
+        msgServer.on('', (data, rawEvent) => {
           console.warn('Received a message w/o an event!', data);
         });
 
         // Listen for messages based on their event (in this case, "chat")
-        msgServer.subscribe('chat', (message, rawEvent) => {
+        msgServer.on('chat', (message, rawEvent) => {
           this.messages.push(message);
         });
 
         // Unsubscribes from event-less messages after 7 seconds
         setTimeout(() => {
-          msgServer.unsubscribe('');
+          msgServer.off('');
 
           console.log('Stopped listening to event-less messages!');
         }, 7000);
 
         // Unsubscribes from chat messages after 7 seconds
         setTimeout(() => {
-          msgServer.unsubscribe('chat');
+          msgServer.off('chat');
 
           console.log('Stopped listening to chat messages');
         }, 14000);
