@@ -121,13 +121,13 @@ export default {
     });
 
     // Handle messages without a specific event
-    sseClient.on('message', handleMessage);
+    sseClient.on('message', this.handleMessage);
 
     // Handle 'chat' messages
-    sseClient.on('chat', handleChat);
+    sseClient.on('chat', this.handleChat);
 
     // Handle once for a ban message
-    sseClient.once('ban', handleBan);
+    sseClient.once('ban', this.handleBan);
 
     sseClient.connect()
       .then(sse => {
@@ -135,13 +135,13 @@ export default {
 
         // Unsubscribes from event-less messages after 7 seconds
         setTimeout(() => {
-          sseClient.off('message', handleMessage);
+          sseClient.off('message', this.handleMessage);
           console.log('Stopped listening to event-less messages!');
         }, 7000);
 
         // Unsubscribes from chat messages after 14 seconds
         setTimeout(() => {
-          sse.off('chat', handleChat);
+          sse.off('chat', this.handleChat);
           console.log('Stopped listening to chat messages!');
         }, 14000);
       })
