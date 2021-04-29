@@ -1,6 +1,6 @@
 {
   "name": "vue-sse",
-  "version": "2.1.2",
+  "version": "2.2.0",
   "description": "A Vue plugin for using Server-Sent Events (EventSource)",
   "main": "dist/vue-sse.common.js",
   "exports": {
@@ -63,6 +63,7 @@
     "@rollup/plugin-buble": "^0.21.3",
     "@rollup/plugin-commonjs": "^17.1.0",
     "@rollup/plugin-node-resolve": "^11.2.0",
+    "@vue/test-utils": "^1.1.4",
     "babel-jest": "^26.6.3",
     "babel-loader": "^8.2.2",
     "eslint": "^7.20.0",

@@ -13,8 +13,13 @@ export interface SSEConfig {
 	withCredentials?: boolean;
 }
 
+export interface SSEComponentOptions {
+	cleanup?: boolean;
+}
+
 export declare class SSEManager {
 	$defaultConfig: SSEConfig;
+	$clients: SSEClient[] | null;
 
 	constructor(config?: SSEConfig);
 	create(configOrURL?: SSEConfig | string): SSEClient;

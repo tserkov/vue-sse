@@ -1,5 +1,5 @@
 /*!
- * vue-sse v2.1.1
+ * vue-sse v2.2.0
  * (c) 2021 James Churchard
  * @license MIT
  */
@@ -162,6 +162,29 @@ function install(Vue, config) {
   if (config && config.polyfill) {
     Promise.resolve().then(function () { return eventsource$1; });
   }
+
+  // This mixin allows components to specify that all clients that were
+  // created within it should be automatically disconnected (cleanup)
+  // when the component is destroyed.
+  Vue.mixin({
+    beforeCreate: function beforeCreate() {
+      if (this.$options.sse && this.$options.sse.cleanup) {
+        // We instantiate an SSEManager for this specific instance
+        // in order to track it (see discussions in #13 for rationale).
+        this.$sse = new SSEManager();
+
+        // We also set $clients to an empty array, as opposed to null,
+        // so that beforeDestroy and create know to use it.
+        this.$sse.$clients = [];
+      }
+    },
+    beforeDestroy: function beforeDestroy() {
+      if (this.$sse.$clients !== null) {
+        this.$sse.$clients.forEach(function (c) { return c.disconnect(); });
+        this.$sse.$clients = [];
+      }
+    }
+  });
 }
 
 var SSEManager = function SSEManager(config) {
@@ -172,6 +195,8 @@ var SSEManager = function SSEManager(config) {
     },
     config
   );
+
+  this.$clients = null;
 };
 
 SSEManager.prototype.create = function create (configOrURL) {
@@ -186,7 +211,15 @@ SSEManager.prototype.create = function create (configOrURL) {
     config = {};
   }
 
-  return new SSEClient(Object.assign({}, this.$defaultConfig, config));
+  var client = new SSEClient(Object.assign({}, this.$defaultConfig, config));
+
+  // If $clients is not null, then it's array that we should push this
+  // client into for later cleanup in our mixin's beforeDestroy.
+  if (this.$clients !== null) {
+    this.$clients.push(client);
+  }
+
+  return client;
 };
 
 var index = {

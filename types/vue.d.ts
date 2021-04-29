@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { SSEManager } from './index';
+import { SSEComponentOptions, SSEManager } from './index';
 
 declare module 'vue/types/vue' {
   interface VueConstructor {
@@ -8,5 +8,11 @@ declare module 'vue/types/vue' {
 
   interface Vue {
     $sse: SSEManager;
+  }
+}
+
+declare module 'vue/types/options' {
+  interface ComponentOptions<V extends Vue> {
+    sse?: SSEComponentOptions;
   }
 }

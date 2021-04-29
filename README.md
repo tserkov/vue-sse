@@ -77,6 +77,22 @@ Once you've successfully connected to an events server, a client will be returne
 | --- | --- | --- |
 | source | `EventSource` | Returns the underlying EventSource. |
 
+## Cleanup
+Every connection must be disconnected when the component is destroyed. There are two ways to achieve this:
+1. Call `disconnect()` on the client during `beforeDestroy`, or
+2. Add the following option to your component to have them automatically closed for you during `beforeDestroy`:
+```js
+export default {
+    name: 'my-component',
+    data() { /* ... */ },
+    // ...
+    sse: {
+        cleanup: true,
+    },
+    // ...
+}
+```
+
 ## Example
 An example project is provided at [tserkov/vue-sse-example](https://github.com/tserkov/vue-sse-example).
 
@@ -170,6 +186,9 @@ export default {
     // Make sure to close the connection with the events server
     // when the component is destroyed, or we'll have ghost connections!
     sseClient.disconnect();
+
+    // Alternatively, we could have added the `sse: { cleanup: true }` option to our component,
+    // and the SSEManager would have automatically disconnected during beforeDestroy.
   },
 };
 </script>
