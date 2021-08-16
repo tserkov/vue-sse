@@ -24,7 +24,7 @@ Vue.use(VueSSE);
 Vue.use(VueSSE, {
   format: 'json',
   polyfill: true,
-  url: '/my-events-server'
+  url: '/my-events-server',
   withCredentials: true,
 });
 ```
