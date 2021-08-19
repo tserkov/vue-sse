@@ -46,9 +46,12 @@ export default class SSEClient {
 
   connect() {
     if (this.forcePolyfill) {
-      this._source = EventSourcePolyfill(this.url, Object.assign({}, this.config.polyfillOptions, {
-        withCredentials: this.withCredentials,
-      }));
+      this._source = EventSourcePolyfill(
+        this.url,
+        Object.assign({}, this.config.polyfillOptions, {
+          withCredentials: this.withCredentials,
+        }),
+      );
     } else {
       this._source = new window.EventSource(this.url, {
         withCredentials: this.withCredentials,

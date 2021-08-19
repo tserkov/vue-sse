@@ -25,10 +25,10 @@ export function install(Vue, config) {
     },
     beforeDestroy() {
       if (this.$sse.$clients !== null) {
-        this.$sse.$clients.forEach(c => c.disconnect());
+        this.$sse.$clients.forEach((c) => c.disconnect());
         this.$sse.$clients = [];
       }
-    }
+    },
   });
 }
 
