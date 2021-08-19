@@ -1,3 +1,5 @@
+import { EventSourcePolyfill } from 'event-source-polyfill';
+
 export const formatText = (e) => e.data;
 
 export const formatJSON = (e) => JSON.parse(e.data);
@@ -34,6 +36,8 @@ export default class SSEClient {
 
     this.url = config.url;
     this.withCredentials = !!config.withCredentials;
+    this.polyfillOptions = config.polyfillOptions || {};
+    this.forcePolyfill = !!config.forcePolyfill;
   }
 
   get source() {
@@ -41,9 +45,15 @@ export default class SSEClient {
   }
 
   connect() {
-    this._source = new window.EventSource(this.url, {
-      withCredentials: this.withCredentials,
-    });
+    if (this.forcePolyfill) {
+      this._source = EventSourcePolyfill(this.url, Object.assign({}, this.config.polyfillOptions, {
+        withCredentials: this.withCredentials,
+      }));
+    } else {
+      this._source = new window.EventSource(this.url, {
+        withCredentials: this.withCredentials,
+      });
+    }
 
     return new Promise((resolve, reject) => {
       this._source.onopen = () => {

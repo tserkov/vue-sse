@@ -5,230 +5,6 @@
  */
 'use strict';
 
-var formatText = function (e) { return e.data; };
-
-var formatJSON = function (e) { return JSON.parse(e.data); };
-
-var SSEClient = function SSEClient(config) {
-  this._handlers = {};
-  this._listeners = {};
-  this._source = null;
-
-  if (config.format) {
-    if (typeof config.format === 'string') {
-      if (config.format === 'plain') {
-        this._format = formatText;
-      } else if (config.format === 'json') {
-        this._format = formatJSON;
-      } else {
-        this._format = formatText;
-      }
-    } else if (typeof config.format === 'function') {
-      this._format = config.format;
-    } else {
-      this._format = formatText;
-    }
-  } else {
-    this._format = formatText;
-  }
-
-  if (config.handlers) {
-    for (var event in config.handlers) {
-      this.on(event, config.handlers[event]);
-    }
-  }
-
-  this.url = config.url;
-  this.withCredentials = !!config.withCredentials;
-};
-
-var prototypeAccessors = { source: { configurable: true } };
-
-prototypeAccessors.source.get = function () {
-  return this._source;
-};
-
-SSEClient.prototype.connect = function connect () {
-    var this$1 = this;
-
-  this._source = new window.EventSource(this.url, {
-    withCredentials: this.withCredentials,
-  });
-
-  return new Promise(function (resolve, reject) {
-    this$1._source.onopen = function () {
-      // Add event listeners that were added before we connected
-      for (var event in this$1._listeners) {
-        this$1._source.addEventListener(event, this$1._listeners[event]);
-      }
-
-      this$1._source.onerror = null;
-
-      resolve(this$1);
-    };
-
-    this$1._source.onerror = reject;
-  });
-};
-
-SSEClient.prototype.disconnect = function disconnect () {
-  if (this._source !== null) {
-    this._source.close();
-    this._source = null;
-  }
-};
-
-SSEClient.prototype.on = function on (event, handler) {
-  if (!event) {
-    // Default "event-less" event
-    event = 'message';
-  }
-
-  if (!this._listeners[event]) {
-    this._create(event);
-  }
-
-  this._handlers[event].push(handler);
-
-  return this;
-};
-
-SSEClient.prototype.once = function once (event, handler) {
-    var this$1 = this;
-
-  this.on(event, function (e) {
-    this$1.off(event, handler);
-
-    handler(e);
-  });
-
-  return this;
-};
-
-SSEClient.prototype.off = function off (event, handler) {
-  if (!this._handlers[event]) {
-    // no handlers registered for event
-    return this;
-  }
-
-  var idx = this._handlers[event].indexOf(handler);
-  if (idx === -1) {
-    // handler not registered for event
-    return this;
-  }
-
-  // remove handler from event
-  this._handlers[event].splice(idx, 1);
-
-  if (this._handlers[event].length === 0) {
-    // remove listener since no handlers exist
-    this._source.removeEventListener(event, this._listeners[event]);
-    delete this._handlers[event];
-    delete this._listeners[event];
-  }
-
-  return this;
-};
-
-SSEClient.prototype._create = function _create (event) {
-    var this$1 = this;
-
-  this._handlers[event] = [];
-
-  this._listeners[event] = function (message) {
-    var data;
-
-    try {
-      data = this$1._format(message);
-    } catch (err) {
-      if (typeof this$1._source.onerror === 'function') {
-        this$1._source.onerror(err);
-      }
-      return;
-    }
-
-    this$1._handlers[event].forEach(function (handler) { return handler(data); });
-  };
-
-  if (this._source) {
-    this._source.addEventListener(event, this._listeners[event]);
-  }
-};
-
-Object.defineProperties( SSEClient.prototype, prototypeAccessors );
-
-function install(Vue, config) {
-  // eslint-disable-next-line no-param-reassign, no-multi-assign
-  Vue.$sse = Vue.prototype.$sse = new SSEManager(config);
-
-  if (config && config.polyfill) {
-    Promise.resolve().then(function () { return eventsource$1; });
-  }
-
-  // This mixin allows components to specify that all clients that were
-  // created within it should be automatically disconnected (cleanup)
-  // when the component is destroyed.
-  Vue.mixin({
-    beforeCreate: function beforeCreate() {
-      if (this.$options.sse && this.$options.sse.cleanup) {
-        // We instantiate an SSEManager for this specific instance
-        // in order to track it (see discussions in #13 for rationale).
-        this.$sse = new SSEManager();
-
-        // We also set $clients to an empty array, as opposed to null,
-        // so that beforeDestroy and create know to use it.
-        this.$sse.$clients = [];
-      }
-    },
-    beforeDestroy: function beforeDestroy() {
-      if (this.$sse.$clients !== null) {
-        this.$sse.$clients.forEach(function (c) { return c.disconnect(); });
-        this.$sse.$clients = [];
-      }
-    }
-  });
-}
-
-var SSEManager = function SSEManager(config) {
-  this.$defaultConfig = Object.assign(
-    {
-      format: formatText,
-      sendCredentials: false,
-    },
-    config
-  );
-
-  this.$clients = null;
-};
-
-SSEManager.prototype.create = function create (configOrURL) {
-  var config;
-  if (typeof configOrURL === 'object') {
-    config = configOrURL;
-  } else if (typeof configOrURL === 'string') {
-    config = {
-      url: configOrURL,
-    };
-  } else {
-    config = {};
-  }
-
-  var client = new SSEClient(Object.assign({}, this.$defaultConfig, config));
-
-  // If $clients is not null, then it's array that we should push this
-  // client into for later cleanup in our mixin's beforeDestroy.
-  if (this.$clients !== null) {
-    this.$clients.push(client);
-  }
-
-  return client;
-};
-
-var index_cjs = {
-  SSEManager: SSEManager,
-  install: install,
-};
-
 var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 function createCommonjsModule(fn) {
@@ -1275,7 +1051,239 @@ var eventsource = createCommonjsModule(function (module, exports) {
 });
 
 var eventsource$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.assign(/*#__PURE__*/Object.create(null), eventsource, {
-  'default': eventsource
+	'default': eventsource
 }));
+
+var formatText = function (e) { return e.data; };
+
+var formatJSON = function (e) { return JSON.parse(e.data); };
+
+var SSEClient = function SSEClient(config) {
+  this._handlers = {};
+  this._listeners = {};
+  this._source = null;
+
+  if (config.format) {
+    if (typeof config.format === 'string') {
+      if (config.format === 'plain') {
+        this._format = formatText;
+      } else if (config.format === 'json') {
+        this._format = formatJSON;
+      } else {
+        this._format = formatText;
+      }
+    } else if (typeof config.format === 'function') {
+      this._format = config.format;
+    } else {
+      this._format = formatText;
+    }
+  } else {
+    this._format = formatText;
+  }
+
+  if (config.handlers) {
+    for (var event in config.handlers) {
+      this.on(event, config.handlers[event]);
+    }
+  }
+
+  this.url = config.url;
+  this.withCredentials = !!config.withCredentials;
+  this.polyfillOptions = config.polyfillOptions || {};
+  this.forcePolyfill = !!config.forcePolyfill;
+};
+
+var prototypeAccessors = { source: { configurable: true } };
+
+prototypeAccessors.source.get = function () {
+  return this._source;
+};
+
+SSEClient.prototype.connect = function connect () {
+    var this$1 = this;
+
+  if (this.forcePolyfill) {
+    this._source = eventsource.EventSourcePolyfill(this.url, Object.assign({}, this.config.polyfillOptions, {
+      withCredentials: this.withCredentials,
+    }));
+  } else {
+    this._source = new window.EventSource(this.url, {
+      withCredentials: this.withCredentials,
+    });
+  }
+
+  return new Promise(function (resolve, reject) {
+    this$1._source.onopen = function () {
+      // Add event listeners that were added before we connected
+      for (var event in this$1._listeners) {
+        this$1._source.addEventListener(event, this$1._listeners[event]);
+      }
+
+      this$1._source.onerror = null;
+
+      resolve(this$1);
+    };
+
+    this$1._source.onerror = reject;
+  });
+};
+
+SSEClient.prototype.disconnect = function disconnect () {
+  if (this._source !== null) {
+    this._source.close();
+    this._source = null;
+  }
+};
+
+SSEClient.prototype.on = function on (event, handler) {
+  if (!event) {
+    // Default "event-less" event
+    event = 'message';
+  }
+
+  if (!this._listeners[event]) {
+    this._create(event);
+  }
+
+  this._handlers[event].push(handler);
+
+  return this;
+};
+
+SSEClient.prototype.once = function once (event, handler) {
+    var this$1 = this;
+
+  this.on(event, function (e) {
+    this$1.off(event, handler);
+
+    handler(e);
+  });
+
+  return this;
+};
+
+SSEClient.prototype.off = function off (event, handler) {
+  if (!this._handlers[event]) {
+    // no handlers registered for event
+    return this;
+  }
+
+  var idx = this._handlers[event].indexOf(handler);
+  if (idx === -1) {
+    // handler not registered for event
+    return this;
+  }
+
+  // remove handler from event
+  this._handlers[event].splice(idx, 1);
+
+  if (this._handlers[event].length === 0) {
+    // remove listener since no handlers exist
+    this._source.removeEventListener(event, this._listeners[event]);
+    delete this._handlers[event];
+    delete this._listeners[event];
+  }
+
+  return this;
+};
+
+SSEClient.prototype._create = function _create (event) {
+    var this$1 = this;
+
+  this._handlers[event] = [];
+
+  this._listeners[event] = function (message) {
+    var data;
+
+    try {
+      data = this$1._format(message);
+    } catch (err) {
+      if (typeof this$1._source.onerror === 'function') {
+        this$1._source.onerror(err);
+      }
+      return;
+    }
+
+    this$1._handlers[event].forEach(function (handler) { return handler(data); });
+  };
+
+  if (this._source) {
+    this._source.addEventListener(event, this._listeners[event]);
+  }
+};
+
+Object.defineProperties( SSEClient.prototype, prototypeAccessors );
+
+function install(Vue, config) {
+  // eslint-disable-next-line no-param-reassign, no-multi-assign
+  Vue.$sse = Vue.prototype.$sse = new SSEManager(config);
+
+  if (config && config.polyfill) {
+    Promise.resolve().then(function () { return eventsource$1; });
+  }
+
+  // This mixin allows components to specify that all clients that were
+  // created within it should be automatically disconnected (cleanup)
+  // when the component is destroyed.
+  Vue.mixin({
+    beforeCreate: function beforeCreate() {
+      if (this.$options.sse && this.$options.sse.cleanup) {
+        // We instantiate an SSEManager for this specific instance
+        // in order to track it (see discussions in #13 for rationale).
+        this.$sse = new SSEManager();
+
+        // We also set $clients to an empty array, as opposed to null,
+        // so that beforeDestroy and create know to use it.
+        this.$sse.$clients = [];
+      }
+    },
+    beforeDestroy: function beforeDestroy() {
+      if (this.$sse.$clients !== null) {
+        this.$sse.$clients.forEach(function (c) { return c.disconnect(); });
+        this.$sse.$clients = [];
+      }
+    }
+  });
+}
+
+var SSEManager = function SSEManager(config) {
+  this.$defaultConfig = Object.assign(
+    {
+      format: formatText,
+      sendCredentials: false,
+    },
+    config
+  );
+
+  this.$clients = null;
+};
+
+SSEManager.prototype.create = function create (configOrURL) {
+  var config;
+  if (typeof configOrURL === 'object') {
+    config = configOrURL;
+  } else if (typeof configOrURL === 'string') {
+    config = {
+      url: configOrURL,
+    };
+  } else {
+    config = {};
+  }
+
+  var client = new SSEClient(Object.assign({}, this.$defaultConfig, config));
+
+  // If $clients is not null, then it's array that we should push this
+  // client into for later cleanup in our mixin's beforeDestroy.
+  if (this.$clients !== null) {
+    this.$clients.push(client);
+  }
+
+  return client;
+};
+
+var index_cjs = {
+  SSEManager: SSEManager,
+  install: install,
+};
 
 module.exports = index_cjs;
