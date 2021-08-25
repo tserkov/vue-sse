@@ -48,7 +48,7 @@ export default class SSEClient {
     if (this.forcePolyfill) {
       this._source = EventSourcePolyfill(
         this.url,
-        Object.assign({}, this.config.polyfillOptions, {
+        Object.assign({}, this.polyfillOptions, {
           withCredentials: this.withCredentials,
         }),
       );
