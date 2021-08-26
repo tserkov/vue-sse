@@ -1,5 +1,5 @@
 /*!
- * vue-sse v2.2.0
+ * vue-sse v2.3.1
  * (c) 2021 James Churchard
  * @license MIT
  */
@@ -1103,9 +1103,12 @@ SSEClient.prototype.connect = function connect () {
     var this$1 = this;
 
   if (this.forcePolyfill) {
-    this._source = eventsource.EventSourcePolyfill(this.url, Object.assign({}, this.config.polyfillOptions, {
-      withCredentials: this.withCredentials,
-    }));
+    this._source = new eventsource.EventSourcePolyfill(
+      this.url,
+      Object.assign({}, this.polyfillOptions, {
+        withCredentials: this.withCredentials,
+      })
+    );
   } else {
     this._source = new window.EventSource(this.url, {
       withCredentials: this.withCredentials,
@@ -1242,7 +1245,7 @@ function install(Vue, config) {
         this.$sse.$clients.forEach(function (c) { return c.disconnect(); });
         this.$sse.$clients = [];
       }
-    }
+    },
   });
 }
 
