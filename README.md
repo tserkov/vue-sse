@@ -54,9 +54,11 @@ Once you've created a client, you can add handlers before or after calling `conn
 | Option | Type | Description | Default |
 | --- | --- | --- | -- |
 | format | `"plain"` \| `"json"` \| `(event: MessageEvent) => any` | Specify pre-processing, if any, to perform on incoming messages. Messages that fail formatting will emit an error. | `"plain"` |
-| polyfill | `boolean` | Include an [EventSource polyfill](https://github.com/Yaffle/EventSource) for older browsers. | `false` |
 | url | `string` | The location of the SSE server. | `""` |
 | withCredentials | `boolean` | Indicates if CORS should be set to include credentials. | `false` |
+| polyfill | `boolean` | Include an [EventSource polyfill](https://github.com/Yaffle/EventSource) for older browsers. | `false` |
+| forcePolyfill | `boolean` | Forces the [EventSource polyfill](https://github.com/Yaffle/EventSource) to always be used over native. | `false` |
+| polyfillOptions | `object` | Custom options to provide to the [EventSource polyfill](https://github.com/Yaffle/EventSource#custom-headers). Only used if `forcePolyfill` is true. | `null` |
 
 If `$sse.create` is called with a string, it must be the URL to the SSE server.
 
@@ -92,6 +94,9 @@ export default {
     // ...
 }
 ```
+
+## Vue 3
+This plugin works the same in both Vue 2 and 3. The Composition API is not yet supported.
 
 ## Example
 An example project is provided at [tserkov/vue-sse-example](https://github.com/tserkov/vue-sse-example).

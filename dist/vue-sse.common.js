@@ -1,5 +1,5 @@
 /*!
- * vue-sse v2.3.1
+ * vue-sse v2.4.0
  * (c) 2021 James Churchard
  * @license MIT
  */
@@ -1218,8 +1218,14 @@ SSEClient.prototype._create = function _create (event) {
 Object.defineProperties( SSEClient.prototype, prototypeAccessors );
 
 function install(Vue, config) {
-  // eslint-disable-next-line no-param-reassign, no-multi-assign
-  Vue.$sse = Vue.prototype.$sse = new SSEManager(config);
+  if (Vue.config && Vue.config.globalProperties) {
+    // Vue3
+    Vue.config.globalProperties.$sse = new SSEManager(config);
+  } else {
+    // Vue2
+    // eslint-disable-next-line no-param-reassign, no-multi-assign
+    Vue.$sse = Vue.prototype.$sse = new SSEManager(config);
+  }
 
   if (config && config.polyfill) {
     Promise.resolve().then(function () { return eventsource$1; });
