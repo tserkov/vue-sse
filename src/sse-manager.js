@@ -1,8 +1,14 @@
 import SSEClient, { formatText } from './sse-client';
 
 export function install(Vue, config) {
-  // eslint-disable-next-line no-param-reassign, no-multi-assign
-  Vue.$sse = Vue.prototype.$sse = new SSEManager(config);
+  if (Vue.config && Vue.config.globalProperties) {
+    // Vue3
+    Vue.config.globalProperties.$sse = new SSEManager(config);
+  } else {
+    // Vue2
+    // eslint-disable-next-line no-param-reassign, no-multi-assign
+    Vue.$sse = Vue.prototype.$sse = new SSEManager(config);
+  }
 
   if (config && config.polyfill) {
     import('event-source-polyfill');
