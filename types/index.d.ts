@@ -37,9 +37,9 @@ export declare class SSEClient {
 	constructor(config?: SSEConfig);
 	connect(): Promise<SSEClient>;
 	disconnect(): void;
-	on(event: string, handler: MessageHandler): void;
-	once(event: string, handler: MessageHandler): void;
-	off(event: string, handler: MessageHandler): void;
+	on(event: string, handler: MessageHandler): SSEClient;
+	once(event: string, handler: MessageHandler): SSEClient;
+	off(event: string, handler: MessageHandler): SSEClient;
 
 	get source(): EventSource;
 }
