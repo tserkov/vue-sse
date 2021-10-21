@@ -183,8 +183,8 @@ export default {
       // and the hypothetical object has these properties.
       this.messages.push(`${message.user} said: ${message.text}`);
     },
-    handleMessage(message) {
-      console.warn('Received a message w/o an event!', message);
+    handleMessage(message, lastEventId) {
+      console.warn('Received a message w/o an event!', message, lastEventId);
     },
   },
   beforeDestroy() {
