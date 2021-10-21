@@ -3,7 +3,7 @@ import Vue from 'vue';
 
 export type MessageFormatter<T> = (event: MessageEvent) => T;
 
-export type MessageHandler = (data: any) => void;
+export type MessageHandler = (data: any, lastEventId: string) => void;
 
 export interface SSEConfig {
 	format?: 'plain' | 'json' | MessageFormatter<any>;

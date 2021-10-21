@@ -146,7 +146,7 @@ export default class SSEClient {
         return;
       }
 
-      this._handlers[event].forEach((handler) => handler(data));
+      this._handlers[event].forEach((handler) => handler(data, message.lastEventId));
     };
 
     if (this._source) {
