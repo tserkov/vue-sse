@@ -1,5 +1,5 @@
 /*!
- * vue-sse v2.4.0
+ * vue-sse v2.5.0
  * (c) 2021 James Churchard
  * @license MIT
  */
@@ -1207,7 +1207,7 @@ SSEClient.prototype._create = function _create (event) {
       return;
     }
 
-    this$1._handlers[event].forEach(function (handler) { return handler(data); });
+    this$1._handlers[event].forEach(function (handler) { return handler(data, message.lastEventId); });
   };
 
   if (this._source) {

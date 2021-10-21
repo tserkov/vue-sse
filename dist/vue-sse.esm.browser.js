@@ -1,5 +1,5 @@
 /*!
- * vue-sse v2.4.0
+ * vue-sse v2.5.0
  * (c) 2021 James Churchard
  * @license MIT
  */
@@ -1198,7 +1198,7 @@ class SSEClient {
         return;
       }
 
-      this._handlers[event].forEach((handler) => handler(data));
+      this._handlers[event].forEach((handler) => handler(data, message.lastEventId));
     };
 
     if (this._source) {
