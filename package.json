@@ -1,6 +1,6 @@
 {
   "name": "vue-sse",
-  "version": "2.5.0",
+  "version": "2.5.1",
   "description": "A Vue plugin for using Server-Sent Events (EventSource)",
   "main": "dist/vue-sse.common.js",
   "exports": {
@@ -55,7 +55,7 @@
     "event-source-polyfill": "^1.0.22"
   },
   "peerDependencies": {
-    "vue": "^2.0.0"
+    "vue": "^2.0.0 || ^3.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.17",
