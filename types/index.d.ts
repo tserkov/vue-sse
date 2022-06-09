@@ -9,6 +9,8 @@ export interface SSEConfig {
 	format?: 'plain' | 'json' | MessageFormatter<any>;
 	handlers?: Partial<Record<string, MessageHandler>>;
 	polyfill?: boolean;
+	forcePolyfill?: boolean;
+	polyfillOptions?: object;
 	url?: string;
 	withCredentials?: boolean;
 }
